@@ -1,0 +1,8 @@
+<svg class="contact-navbar-svg">
+        <line class="contact-navbar-line" x1="0" y1="0" x2="100%" y2="0"></line>
+        <line class="contact-navbar-line" x1="0" y1="33%" x2="100%" y2="33%"></line>
+        <line class="contact-navbar-line" x1="0" y1="66%" x2="100%" y2="66%"></line>
+        <line class="contact-navbar-line" x1="0" y1="100%" x2="100%" y2="100%"></line>
+        <rect class="contact-navbar-square-outer" height="100%" width="30px" x="4%"></rect>
+        <rect class="contact-navbar-square-inner" height="100%" width="30px" x="4%"></rect>
+      </svg>
