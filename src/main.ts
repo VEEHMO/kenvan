@@ -2,6 +2,7 @@ import './css/style.css';
 import './css/home.css';
 import './css/about.css';
 import './css/contact.css';
+import './css/media.css';
 
 // Initialize the TV effect when the page loads
 document.addEventListener('DOMContentLoaded', () => {
@@ -27,6 +28,10 @@ function createStars() {
   const stars = document.querySelector<HTMLDivElement>('.awge-stars');
 
   if (stars) {
+    // Remove previous stars to avoid stacking
+    while (stars.firstChild) {
+      stars.removeChild(stars.firstChild);
+    }
     for (let i = 0; i < 50; i++) {
       const star = document.createElement('div');
       star.className = 'star';
@@ -80,6 +85,9 @@ function loadPage(page: string) {
     case 'media':
       loadMediaPage(content);
       break;
+    case 'asaprocky':
+      loadASAPRockyPage(content);
+      break;
     default:
       loadHomePage(content);
   }
@@ -116,9 +124,11 @@ function loadHomePage(container: HTMLDivElement) {
   navbar.className = 'home-navbar';
 
   const navbarImg = document.createElement('img');
-  navbarImg.src = 'images/logo-kenvan.png';
+  navbarImg.src = '/logo-kenvan.svg';
   navbarImg.alt = 'KEN VAN logo';
   navbarImg.onclick = () => loadPage('home');
+  navbarImg.width = 200;
+  navbarImg.height = 50;
   navbar.appendChild(navbarImg);
 
   homeContent.appendChild(navbar);
@@ -224,9 +234,11 @@ function loadAboutPage(container: HTMLDivElement) {
   navbar.className = 'home-navbar';
 
   const navbarImg = document.createElement('img');
-  navbarImg.src = 'images/logo-kenvan.png';
+  navbarImg.src = '/logo-kenvan.svg';
   navbarImg.alt = 'KEN VAN logo';
   navbarImg.onclick = () => loadPage('home');
+  navbarImg.width = 200;
+  navbarImg.height = 50;
   navbar.appendChild(navbarImg);
 
   aboutContent.appendChild(navbar);
@@ -335,10 +347,10 @@ function loadContactPage(container: HTMLDivElement) {
   navbarBtn.onclick = () => loadPage('home');
 
   const navbarImg = document.createElement('img');
-  navbarImg.src = 'images/logo-kenvan.png';
+  navbarImg.src = '/logo-kenvan.svg';
   navbarImg.alt = 'Home button KEN VAN logo';
-  navbarImg.width = 4167;
-  navbarImg.height = 1188;
+  navbarImg.width = 200;
+  navbarImg.height = 50;
 
   navbarBtn.appendChild(navbarImg);
   navbar.appendChild(navbarBtn);
@@ -621,7 +633,7 @@ function loadDvdPage(container: HTMLDivElement) {
 }
 
 function loadASAPRockyPage(container: HTMLDivElement) {
-  // Similar placeholder as above
+  // Similar placeholder as above, but with stars and a custom error message
   const pageContent = document.createElement('div');
   pageContent.className = 'page-not-implemented';
 
@@ -669,11 +681,16 @@ function loadASAPRockyPage(container: HTMLDivElement) {
 }
 
 function loadMediaPage(container: HTMLDivElement) {
-  // Similar placeholder as above
-  const pageContent = document.createElement('div');
-  pageContent.className = 'page-not-implemented';
+  // Créer le conteneur principal
+  const mediaContent = document.createElement('div');
+  mediaContent.className = 'media-content';
 
-  // Create home button
+  // Créer les étoiles en arrière-plan
+  const stars = document.createElement('div');
+  stars.className = 'awge-stars';
+  mediaContent.appendChild(stars);
+
+  // Créer le bouton Home (globe)
   const homeBtn = document.createElement('button');
   homeBtn.id = 'awge-home';
   homeBtn.className = 'awge-home';
@@ -685,18 +702,171 @@ function loadMediaPage(container: HTMLDivElement) {
   homeImg.width = 80;
   homeImg.height = 80;
   homeBtn.appendChild(homeImg);
-  pageContent.appendChild(homeBtn);
+  mediaContent.appendChild(homeBtn);
 
-  // Create message
-  const message = document.createElement('h1');
-  message.textContent = 'Media page - Coming soon';
-  message.style.position = 'absolute';
-  message.style.top = '50%';
-  message.style.left = '50%';
-  message.style.transform = 'translate(-50%, -50%)';
-  pageContent.appendChild(message);
+  // Créer la navbar
+  const navbar = document.createElement('div');
+  navbar.className = 'home-navbar home-navbar-mobile';
 
-  container.appendChild(pageContent);
+  const navbarBtn = document.createElement('button');
+  navbarBtn.onclick = () => loadPage('home');
+
+  const navbarImg = document.createElement('img');
+  navbarImg.src = '/logo-kenvan.svg';
+  navbarImg.alt = 'Home button KEN VAN logo';
+  navbarImg.width = 200;
+  navbarImg.height = 50;
+
+  navbarBtn.appendChild(navbarImg);
+  navbar.appendChild(navbarBtn);
+  mediaContent.appendChild(navbar);
+
+  // Créer le titre "Directed by AWGE"
+  const mediaTitle = document.createElement('h1');
+  mediaTitle.className = 'media-title';
+  mediaTitle.textContent = 'Directed by AWGE';
+  mediaContent.appendChild(mediaTitle);
+
+  // Créer la navigation Media
+  const mediaNav = document.createElement('div');
+  mediaNav.className = 'media-nav';
+
+  // Créer les éléments de navigation
+  const navItems = [
+    { id: 'pictures', text: 'Pictures' },
+    { id: 'videos', text: 'Videos', active: true }
+  ];
+
+  // Utilisation de for...of au lieu de forEach
+  for (const item of navItems) {
+    const navItem = document.createElement('div');
+    navItem.className = `media-nav-item ${item.active ? 'active' : ''}`;
+    navItem.id = `media-${item.id}`;
+    navItem.textContent = item.text;
+    navItem.onclick = () => {
+      // Si c'est Pictures, on afficherait les images (non implémenté)
+      if (item.id === 'pictures') {
+        alert('Pictures section coming soon');
+      }
+    };
+    mediaNav.appendChild(navItem);
+  }
+
+  mediaContent.appendChild(mediaNav);
+
+  // Liste de vidéos (URL de vidéos à afficher)
+  const videos = [
+    'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'
+  ];
+
+  // Créer le visualiseur de vidéos
+  const videoViewer = document.createElement('div');
+  videoViewer.className = 'media-video-viewer';
+
+  const videoContainer = document.createElement('div');
+  videoContainer.className = 'media-video-container';
+
+  // Créer l'élément vidéo
+  const videoElement = document.createElement('video');
+  videoElement.className = 'media-video';
+  videoElement.autoplay = true;
+  videoElement.loop = false;
+  videoElement.muted = false;
+  videoElement.controls = false;
+
+  // Index de la vidéo actuelle
+  let currentVideoIndex = 0;
+
+  // Créer les contrôles de la vidéo
+  const videoControls = document.createElement('div');
+  videoControls.className = 'media-video-controls';
+
+  // Compteur de vidéos
+  const videoCounterText = document.createElement('div');
+  videoCounterText.className = 'media-video-counter';
+  videoCounterText.textContent = `${currentVideoIndex + 1}/${videos.length}`;
+  videoControls.appendChild(videoCounterText);
+
+  // Bouton Next
+  const nextButton = document.createElement('button');
+  nextButton.className = 'media-video-next';
+  nextButton.textContent = 'NEXT';
+  nextButton.onclick = () => {
+    currentVideoIndex = (currentVideoIndex + 1) % videos.length;
+    loadVideo(currentVideoIndex);
+  };
+  videoControls.appendChild(nextButton);
+
+  // Fonction pour charger une vidéo
+  const loadVideo = (index: number) => {
+    videoElement.src = videos[index];
+    videoElement.load();
+    videoElement.play()
+      .catch(error => {
+        console.error('Autoplay was prevented:', error);
+        // Créer un bouton pour lancer la vidéo manuellement si l'autoplay est bloqué
+        const playButton = document.createElement('button');
+        playButton.textContent = 'Play Video';
+        playButton.style.position = 'absolute';
+        playButton.style.top = '50%';
+        playButton.style.left = '50%';
+        playButton.style.transform = 'translate(-50%, -50%)';
+        playButton.style.zIndex = '10';
+        playButton.style.padding = '10px 20px';
+        playButton.style.background = 'rgba(0, 0, 0, 0.7)';
+        playButton.style.color = 'white';
+        playButton.style.border = '1px solid white';
+        playButton.style.borderRadius = '5px';
+        playButton.style.cursor = 'pointer';
+        playButton.onclick = () => {
+          videoElement.play();
+          playButton.remove();
+        };
+        videoContainer.appendChild(playButton);
+      });
+    videoCounterText.textContent = `${index + 1}/${videos.length}`;
+  };
+
+  // Charger la première vidéo
+  loadVideo(currentVideoIndex);
+
+  // Gestionnaire d'événement pour passer à la vidéo suivante quand la vidéo actuelle est terminée
+  videoElement.addEventListener('ended', () => {
+    currentVideoIndex = (currentVideoIndex + 1) % videos.length;
+    loadVideo(currentVideoIndex);
+  });
+
+  // Ajouter l'élément vidéo au conteneur
+  videoContainer.appendChild(videoElement);
+
+  // Ajouter les contrôles au conteneur
+  videoContainer.appendChild(videoControls);
+
+  // Ajouter le conteneur au visualiseur
+  videoViewer.appendChild(videoContainer);
+
+  // Ajouter le visualiseur au conteneur principal
+  mediaContent.appendChild(videoViewer);
+
+  // Créer le copyright
+  const copyright = document.createElement('div');
+  copyright.className = 'kenvan-copyright';
+
+  const copyrightText = document.createElement('h4');
+  copyrightText.className = 'kenvan-copyright-text';
+  copyrightText.innerHTML = '©&nbsp;&nbsp;2025&nbsp;&nbsp;KEN VAN';
+
+  copyright.appendChild(copyrightText);
+  mediaContent.appendChild(copyright);
+
+  // Ajouter tout au conteneur
+  container.appendChild(mediaContent);
+
+  // Créer les étoiles en arrière-plan
+  createStars();
 }
 
 // Function to set up navigation event handlers

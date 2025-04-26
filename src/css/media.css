@@ -1,157 +1,146 @@
 /* Media Page Styles */
-
 .media-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100%;
-  width: 100%;
-  position: relative;
-  overflow: auto;
-  padding-bottom: 60px;
+  justify-content: center;
 }
 
-.media-container {
-  width: 90%;
-  max-width: 1200px;
-  margin-top: 80px;
-  padding: 20px;
-  background-color: rgba(0, 0, 0, 0.7);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.media-header {
-  font-size: 2rem;
+/* Style pour le titre "Directed by AWGE" */
+.media-title {
+  font-family: 'Press Start 2P', monospace;
   color: white;
   text-align: center;
-  margin-bottom: 20px;
-  letter-spacing: 3px;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  margin-bottom: 40px;
+  font-size: 1.8rem;
 }
 
-/* Video Player */
-.video-player-container {
-  width: 100%;
-  aspect-ratio: 16/9;
-  margin-bottom: 30px;
-  background-color: black;
-  border-radius: 5px;
+/* Navigation Media */
+.media-nav {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.media-nav-item {
+  font-family: 'Press Start 2P', monospace;
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.media-nav-item:hover, .media-nav-item.active {
+  color: #f5f5f5;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+  transform: scale(1.05);
+}
+
+/* Visualiseur de vidéos */
+.media-video-viewer {
+  width: 80%;
+  max-width: 800px;
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background-color: #000;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
 }
 
-.video-player {
+.media-video-container {
+  position: relative;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  background-color: black;
-}
-
-/* Video Controls Styling (custom player look) */
-.video-player::-webkit-media-controls {
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
-.video-player::-webkit-media-controls-panel {
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
-.video-player::-webkit-media-controls-play-button {
-  background-color: transparent;
-  color: white;
-}
-
-/* Playlist */
-.video-playlist {
-  width: 100%;
-  margin-top: 20px;
-}
-
-.playlist-header {
-  font-size: 1.5rem;
-  color: white;
-  margin-bottom: 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding-bottom: 10px;
-}
-
-.playlist-item {
   display: flex;
+  justify-content: center;
   align-items: center;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  background-color: rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
-.playlist-item:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.thumbnail-container {
-  width: 120px;
-  height: 68px;
-  overflow: hidden;
-  border-radius: 3px;
-  margin-right: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.video-thumbnail {
+.media-video {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.video-info {
-  flex: 1;
+/* Contrôles du visualiseur */
+.media-video-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 15px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.video-title {
-  font-size: 1rem;
+.media-video-container:hover .media-video-controls {
+  opacity: 1;
+}
+
+.media-video-next {
+  background: none;
+  border: none;
   color: white;
-  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: all 0.3s ease;
 }
 
-/* Responsive Video Player */
+.media-video-next:hover {
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+}
+
+/* Numéro de la vidéo actuelle sur le total */
+.media-video-counter {
+  color: white;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+}
+
+/* Overlay TV */
+.media-video-viewer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Responsive design */
 @media (max-width: 768px) {
-  .media-container {
-    width: 95%;
-    padding: 15px;
-  }
-
-  .media-header {
-    font-size: 1.5rem;
-  }
-
-  .playlist-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .thumbnail-container {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16/9;
-    margin-right: 0;
-    margin-bottom: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .media-container {
-    margin-top: 60px;
-    padding: 10px;
-  }
-
-  .media-header {
+  .media-title {
     font-size: 1.2rem;
   }
 
-  .playlist-header {
-    font-size: 1.2rem;
+  .media-nav-item {
+    font-size: 0.9rem;
+  }
+
+  .media-video-viewer {
+    width: 90%;
   }
 }
