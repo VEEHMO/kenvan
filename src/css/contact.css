@@ -123,6 +123,35 @@
   background-color: #555;
 }
 
+.contact-footer-text:disabled {
+  background-color: #333;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Status message */
+.contact-status-message {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  font-family: monospace;
+  text-align: center;
+  font-size: 0.9rem;
+  display: none;
+}
+
+.contact-status-message.success {
+  background-color: rgba(0, 128, 0, 0.2);
+  color: #00ff00;
+  border: 1px solid #00ff00;
+}
+
+.contact-status-message.error {
+  background-color: rgba(255, 0, 0, 0.2);
+  color: #ff6666;
+  border: 1px solid #ff0000;
+}
+
 /* Copyright at bottom */
 .awge-copyright {
   margin-top: 30px;

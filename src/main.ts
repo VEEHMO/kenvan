@@ -93,6 +93,11 @@ function loadPage(page: string) {
   }
 }
 
+// Fonction pour ouvrir des liens externes
+function openExternalLink(url: string) {
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
 // Function to load the home page
 function loadHomePage(container: HTMLDivElement) {
   // Create the container
@@ -152,17 +157,22 @@ function loadHomePage(container: HTMLDivElement) {
     { class: 'contact', img: 'https://ext.same-assets.com/1659927241/2519848551.gif', text: 'CONTACT' }
   ];
 
-  // Add grid items
+  // Add grid items with consistent sizing
   for (const item of gridItems) {
     if (item.class !== 'empty') {
       const gridItem = document.createElement('div');
       gridItem.className = `grid-item ${item.class}`;
       gridItem.onclick = () => loadPage(item.class);
 
+      const gridImgContainer = document.createElement('div');
+      gridImgContainer.className = 'grid-img-container';
+
       const gridImg = document.createElement('img');
       gridImg.src = item.img;
       gridImg.alt = item.text;
-      gridItem.appendChild(gridImg);
+      gridImg.className = 'grid-img';
+      gridImgContainer.appendChild(gridImg);
+      gridItem.appendChild(gridImgContainer);
 
       const gridText = document.createElement('div');
       gridText.className = 'grid-item-text';
@@ -179,6 +189,43 @@ function loadHomePage(container: HTMLDivElement) {
   }
 
   homeContent.appendChild(grid);
+
+  // Créer la barre des réseaux sociaux
+  const socialBar = document.createElement('div');
+  socialBar.className = 'social-bar';
+
+  // Définir les icônes de réseaux sociaux
+  const socialLinks = [
+    {
+      name: 'Instagram',
+      icon: 'https://ext.same-assets.com/2425485264/2448957733.svg',
+      url: 'https://www.instagram.com/awge/'
+    },
+    {
+      name: 'YouTube',
+      icon: 'https://ext.same-assets.com/2425485264/1685907107.svg',
+      url: 'https://www.youtube.com/channel/UCxX4WXZq6SvJxJF2QvHvUHQ'
+    }
+  ];
+
+  // Ajouter les icônes de réseaux sociaux
+  for (const social of socialLinks) {
+    const socialLink = document.createElement('button');
+    socialLink.className = 'social-link';
+    socialLink.title = social.name;
+    socialLink.onclick = () => openExternalLink(social.url);
+
+    const socialIcon = document.createElement('img');
+    socialIcon.src = social.icon;
+    socialIcon.alt = social.name;
+    socialIcon.width = 32;
+    socialIcon.height = 32;
+
+    socialLink.appendChild(socialIcon);
+    socialBar.appendChild(socialLink);
+  }
+
+  homeContent.appendChild(socialBar);
 
   // Create copyright
   const copyright = document.createElement('div');
@@ -498,21 +545,112 @@ function loadContactPage(container: HTMLDivElement) {
   const contactFooter = document.createElement('div');
   contactFooter.className = 'contact-footer';
 
+  // Créer une notification pour les messages de statut
+  const statusMessage = document.createElement('div');
+  statusMessage.className = 'contact-status-message';
+  statusMessage.id = 'contact-status';
+  statusMessage.style.display = 'none';
+  contactContainer.appendChild(statusMessage);
+
+  // Fonction pour afficher un message de statut
+  const showStatus = (message: string, isError = false) => {
+    statusMessage.textContent = message;
+    statusMessage.className = `contact-status-message ${isError ? 'error' : 'success'}`;
+    statusMessage.style.display = 'block';
+
+    // Masquer le message après 5 secondes
+    setTimeout(() => {
+      statusMessage.style.display = 'none';
+    }, 5000);
+  };
+
+  // Fonction pour vérifier si l'email est valide
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Fonction pour envoyer le message
+  const sendMessage = async (recipient: string) => {
+    const emailInput = document.getElementById('contact-email') as HTMLTextAreaElement;
+    const subjectInput = document.getElementById('contact-subject') as HTMLTextAreaElement;
+    const messageInput = document.getElementById('contact-message') as HTMLTextAreaElement;
+
+    const email = emailInput.value.trim();
+    const subject = subjectInput.value.trim();
+    const message = messageInput.value.trim();
+
+    // Validation
+    if (!email) {
+      showStatus('Veuillez entrer votre email', true);
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      showStatus('Veuillez entrer un email valide', true);
+      return;
+    }
+
+    if (!message) {
+      showStatus('Veuillez entrer un message', true);
+      return;
+    }
+
+    try {
+      // Désactiver les boutons pendant l'envoi
+      sendToAwge.disabled = true;
+      sendToOrderSupport.disabled = true;
+
+      // Afficher un message de chargement
+      showStatus('Envoi en cours...');
+
+      // Envoyer la requête à l'API
+      const response = await fetch('http://localhost:3000/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          subject,
+          message,
+          recipient
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showStatus('Message envoyé avec succès !');
+
+        // Réinitialiser les champs
+        emailInput.value = '';
+        subjectInput.value = '';
+        messageInput.value = '';
+      } else {
+        showStatus('Erreur lors de l\'envoi du message : ' + data.message, true);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi du message :', error);
+      showStatus('Erreur lors de l\'envoi du message. Veuillez réessayer plus tard.', true);
+    } finally {
+      // Réactiver les boutons
+      sendToAwge.disabled = false;
+      sendToOrderSupport.disabled = false;
+    }
+  };
+
   const sendToAwge = document.createElement('button');
   sendToAwge.className = 'contact-footer-text';
   sendToAwge.id = 'contact-send-awge';
   sendToAwge.innerHTML = 'SEND TO<br>AWGE';
-  sendToAwge.onclick = () => {
-    alert('Email functionality coming soon');
-  };
+  sendToAwge.onclick = () => sendMessage('AWGE');
 
   const sendToOrderSupport = document.createElement('button');
   sendToOrderSupport.className = 'contact-footer-text';
   sendToOrderSupport.id = 'contact-send-order-support';
   sendToOrderSupport.innerHTML = 'SEND TO<br>ORDER SUPPORT';
-  sendToOrderSupport.onclick = () => {
-    alert('Email functionality coming soon');
-  };
+  sendToOrderSupport.onclick = () => sendMessage('ORDER SUPPORT');
 
   contactFooter.appendChild(sendToAwge);
   contactFooter.appendChild(sendToOrderSupport);
@@ -680,6 +818,112 @@ function loadASAPRockyPage(container: HTMLDivElement) {
   createStars();
 }
 
+// Interface pour les photos
+interface Photo {
+  id: number;
+  url: string;
+  alt: string;
+  width: number;
+  height: number;
+}
+
+// Tableau statique de photos (utilisé si l'API ne fonctionne pas)
+const defaultPhotos: Photo[] = [
+  {
+    id: 1,
+    url: 'https://ext.same-assets.com/3305109517/1952260857.jpeg',
+    alt: 'AWGE photoshoot 1',
+    width: 640,
+    height: 957
+  },
+  {
+    id: 2,
+    url: 'https://ext.same-assets.com/3305109517/4151179022.jpeg',
+    alt: 'AWGE photoshoot 2',
+    width: 640,
+    height: 957
+  },
+  {
+    id: 3,
+    url: 'https://ext.same-assets.com/3305109517/1503419552.jpeg',
+    alt: 'AWGE photoshoot 3',
+    width: 640,
+    height: 957
+  },
+  {
+    id: 4,
+    url: 'https://ext.same-assets.com/3305109517/1403498987.jpeg',
+    alt: 'AWGE group photo 1',
+    width: 640,
+    height: 427
+  },
+  {
+    id: 5,
+    url: 'https://ext.same-assets.com/3305109517/3228777784.jpeg',
+    alt: 'AWGE group photo 2',
+    width: 640,
+    height: 427
+  },
+  {
+    id: 6,
+    url: 'https://ext.same-assets.com/3305109517/81589092.jpeg',
+    alt: 'AWGE car scene',
+    width: 640,
+    height: 427
+  },
+  {
+    id: 7,
+    url: 'https://ext.same-assets.com/3305109517/2592776774.jpeg',
+    alt: 'AWGE outdoor shoot',
+    width: 640,
+    height: 957
+  },
+  {
+    id: 8,
+    url: 'https://ext.same-assets.com/3305109517/1860890217.jpeg',
+    alt: 'AWGE portrait 1',
+    width: 640,
+    height: 957
+  }
+];
+
+// Fonction pour créer une modale d'image
+function createPictureModal() {
+  // Vérifier si la modale existe déjà
+  if (document.getElementById('pictures-modal')) return;
+
+  const modalOverlay = document.createElement('div');
+  modalOverlay.className = 'modal-overlay';
+  modalOverlay.id = 'pictures-overlay';
+  modalOverlay.style.display = 'none';
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-modal pictures-modal';
+  modal.id = 'pictures-modal';
+
+  const modalImage = document.createElement('img');
+  modalImage.id = 'pictures-modal-image';
+  modalImage.className = 'pictures-modal-image';
+  modalImage.onclick = () => {
+    modalOverlay.style.display = 'none';
+  };
+
+  modal.appendChild(modalImage);
+  modalOverlay.appendChild(modal);
+  document.body.appendChild(modalOverlay);
+}
+
+// Fonction pour afficher une image dans la modale
+function showPictureModal(imageUrl: string) {
+  const modalOverlay = document.getElementById('pictures-overlay') as HTMLDivElement;
+  const modalImage = document.getElementById('pictures-modal-image') as HTMLImageElement;
+
+  if (modalOverlay && modalImage) {
+    modalImage.src = imageUrl;
+    modalOverlay.style.display = 'flex';
+  }
+}
+
 function loadMediaPage(container: HTMLDivElement) {
   // Créer le conteneur principal
   const mediaContent = document.createElement('div');
@@ -731,28 +975,106 @@ function loadMediaPage(container: HTMLDivElement) {
   const mediaNav = document.createElement('div');
   mediaNav.className = 'media-nav';
 
+  // Conteneurs pour les sections vidéos et photos
+  const videoSection = document.createElement('div');
+  videoSection.className = 'media-section video-section';
+  videoSection.id = 'video-section';
+
+  const photoSection = document.createElement('div');
+  photoSection.className = 'media-section photo-section';
+  photoSection.id = 'photo-section';
+  photoSection.style.display = 'none';
+
+  // Créer le visualiseur de photos
+  const pictureViewer = document.createElement('div');
+  pictureViewer.className = 'media-picture-viewer';
+
+  const pictureContainer = document.createElement('div');
+  pictureContainer.className = 'media-picture-container';
+
   // Créer les éléments de navigation
   const navItems = [
     { id: 'pictures', text: 'Pictures' },
     { id: 'videos', text: 'Videos', active: true }
   ];
 
-  // Utilisation de for...of au lieu de forEach
+  // Ajouter les éléments de navigation
   for (const item of navItems) {
     const navItem = document.createElement('div');
     navItem.className = `media-nav-item ${item.active ? 'active' : ''}`;
     navItem.id = `media-${item.id}`;
     navItem.textContent = item.text;
     navItem.onclick = () => {
-      // Si c'est Pictures, on afficherait les images (non implémenté)
+      // Mettre à jour l'interface selon le choix
+      document.querySelectorAll('.media-nav-item').forEach(el => el.classList.remove('active'));
+      navItem.classList.add('active');
+
       if (item.id === 'pictures') {
-        alert('Pictures section coming soon');
+        videoSection.style.display = 'none';
+        photoSection.style.display = 'block';
+
+        // Charger les photos
+        loadPhotos(pictureContainer);
+      } else {
+        photoSection.style.display = 'none';
+        videoSection.style.display = 'block';
       }
     };
     mediaNav.appendChild(navItem);
   }
 
   mediaContent.appendChild(mediaNav);
+
+  // Fonction pour charger les photos
+  const loadPhotos = async (container: HTMLDivElement) => {
+    // Vider le conteneur
+    container.innerHTML = '';
+
+    try {
+      // Essayer de récupérer les photos depuis l'API
+      let photos = defaultPhotos;
+
+      try {
+        const response = await fetch('http://localhost:3000/api/photos');
+        const data = await response.json();
+        if (data.success && data.photos && data.photos.length > 0) {
+          photos = data.photos;
+        }
+      } catch (error) {
+        console.warn('Impossible de récupérer les photos depuis l\'API, utilisation des photos par défaut:', error);
+      }
+
+      // Créer la modale pour les images
+      createPictureModal();
+
+      // Ajouter chaque photo au conteneur
+      photos.forEach(photo => {
+        const imgContainer = document.createElement('div');
+        imgContainer.className = 'picture-item';
+
+        const img = document.createElement('img');
+        img.src = photo.url;
+        img.alt = photo.alt;
+        img.loading = 'lazy';
+        img.width = photo.width;
+        img.height = photo.height;
+
+        // Ajouter un gestionnaire d'événement pour ouvrir la modale
+        img.onclick = () => showPictureModal(photo.url);
+
+        imgContainer.appendChild(img);
+        container.appendChild(imgContainer);
+      });
+    } catch (error) {
+      console.error('Erreur lors du chargement des photos:', error);
+
+      // Message d'erreur
+      const errorMsg = document.createElement('div');
+      errorMsg.className = 'photos-error';
+      errorMsg.textContent = 'Impossible de charger les images';
+      container.appendChild(errorMsg);
+    }
+  };
 
   // Liste de vidéos (URL de vidéos à afficher)
   const videos = [
@@ -848,8 +1170,14 @@ function loadMediaPage(container: HTMLDivElement) {
   // Ajouter le conteneur au visualiseur
   videoViewer.appendChild(videoContainer);
 
-  // Ajouter le visualiseur au conteneur principal
-  mediaContent.appendChild(videoViewer);
+  // Ajouter les visualiseurs aux sections respectives
+  videoSection.appendChild(videoViewer);
+  photoSection.appendChild(pictureViewer);
+  pictureViewer.appendChild(pictureContainer);
+
+  // Ajouter les sections au conteneur principal
+  mediaContent.appendChild(videoSection);
+  mediaContent.appendChild(photoSection);
 
   // Créer le copyright
   const copyright = document.createElement('div');
